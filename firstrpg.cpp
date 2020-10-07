@@ -15,7 +15,7 @@ int battle_initiator = rand() % 100;
 int enemy_picker = 5;
 int player_hp = 0;
 int player_maxhp = 0;
-int player_spd = 0;
+double player_spd = 0.00;
 int player_def = 0;
 int player_sp = 50;
 int player_con = 0;
@@ -23,6 +23,7 @@ int player_level = 1;
 int player_xp = 0;
 int player_level_target = 100;
 double hit_chance;
+double hit_success;
 string player_name;
 bool player_setup = false;
 int player_class = 0;
@@ -68,7 +69,8 @@ void gameover(){
     exit(0);
     }
 //Battle System. This requires incorporation of character speed and defense to make more variance in results.
-void battle(string monster_name, int monster_hp, int monster_atk, int xp_reward, int monster_spd){ //Declare the values of the functions variables within the code.
+void battle(string monster_name, int monster_hp, int monster_atk, int xp_reward, double monster_spd){ //Declare the values of the functions variables within the code.
+            srand (time(NULL));
             cout << monster_name << " Appeared!" << endl;
             while (monster_hp > 0 && battle_command != 0){
                 cout << "What would you like to do?" << endl << "1. Attack" << endl << "2. Heal" << endl << "3. Escape" << endl;
@@ -90,8 +92,16 @@ void battle(string monster_name, int monster_hp, int monster_atk, int xp_reward,
                         PressEnter();
                     }
                     if (hit_chance <= 0.99){
-                        cout << "You swing at the enemy, but they dodge easily." << endl;
-                        PressEnter();
+                        hit_success = rand() % 100;
+                        if(hit_success <= hit_chance*100){
+                           battle_attack = rand() % player_atk*0.1 + player_atk;
+                            cout << "You do " << battle_attack << " amount of damage!" << endl;
+                            monster_hp = monster_hp - battle_attack;
+                            cout << monster_name << " now has " << monster_hp << " HP!" << endl;
+                            PressEnter();
+                        } else {
+                            cout << "You swing at the enemy, but they dodge easily." << endl;
+                            PressEnter();
                         }
                     if (monster_hp >= 1){
                         player_damage = (rand() % 1 + monster_atk) - player_def/2;
@@ -154,11 +164,11 @@ void battle(string monster_name, int monster_hp, int monster_atk, int xp_reward,
                     level_up();
                     battle_initiator = 0;
                     enemy_picker = 0;
-                    monster_hp = 0;s
+                    monster_hp = 0;
                 }
         }
     }
-
+}
 int main(){
         while (player_setup == false){
         cout << "Please select your character name: ";
@@ -173,7 +183,7 @@ int main(){
             player_maxhp = 200;
             player_hp = 200;
             player_atk = 25;
-            player_spd = 5;
+            player_spd = 12;
             player_def = 25;
             class_name = "Warrior";
             classmaker();
@@ -184,7 +194,7 @@ int main(){
             player_maxhp = 80;
             player_hp = 80;
             player_atk = 12;
-            player_spd = 5;
+            player_spd = 14;
             player_def = 12;
             class_name = "Mage";
             classmaker();
@@ -206,7 +216,7 @@ int main(){
             player_maxhp = 90;
             player_hp = 90;
             player_atk = 10;
-            player_spd = 7;
+            player_spd = 16;
             player_def = 10;
             class_name = "Healer";
             classmaker();
@@ -270,19 +280,19 @@ int main(){
                 cout << "/nAn enemy appeared!" << endl;
                 enemy_picker = rand() % 5 + 1;
                 if (enemy_picker == 1){
-                    battle("Rat", 5, 10, 15, 10);
+                    battle("Rat", 5, 10, 15, 10.00);
                 }
                 if (enemy_picker == 2){
-                    battle("Cat", 12, 7, 19, 8);
+                    battle("Cat", 12, 7, 19, 8.00);
                 }
                 if (enemy_picker == 3){
-                    battle ("Bat", 9, 6, 15, 22);
+                    battle ("Bat", 9, 6, 15, 22.00);
                 }
                 if (enemy_picker == 4){
-                    battle ("Panther", 15, 9, 24, 33);
+                    battle ("Panther", 15, 9, 24, 41.00);
                 }
                 if (enemy_picker == 5){
-                    battle ("Tiger", 20, 12, 15, 40);
+                    battle ("Tiger", 20, 12, 15, 40.00);
                 }
             }
     }
