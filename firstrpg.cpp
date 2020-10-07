@@ -3,9 +3,10 @@
 #include <cstdlib>
 #include <stdlib.h>
 #include <limits>
-
-
 using namespace std;
+//above defines the libraries required and the std:: prefix for outputs
+
+
 int battle_command = 9; //9 is the default value as zero is when the command loop is termianted.
 int battle_attack = 0;
 int player_damage = 0;
@@ -21,10 +22,14 @@ int player_con = 0;
 int player_level = 1;
 int player_xp = 0;
 int player_level_target = 100;
+double hit_chance;
 string player_name;
 bool player_setup = false;
 int player_class = 0;
 string class_name = "unknown";
+
+
+
 //Function prompting the user to press any key.
 void PressEnter(){
     cout << "Press Any Key To Continue." << endl;
@@ -63,25 +68,36 @@ void gameover(){
     exit(0);
     }
 //Battle System. This requires incorporation of character speed and defense to make more variance in results.
-void battle(string monster_name, int monster_hp, int monster_atk, int xp_reward){ //Declare the values of the functions variables within the code.
+void battle(string monster_name, int monster_hp, int monster_atk, int xp_reward, int monster_spd){ //Declare the values of the functions variables within the code.
             cout << monster_name << " Appeared!" << endl;
             while (monster_hp > 0 && battle_command != 0){
                 cout << "What would you like to do?" << endl << "1. Attack" << endl << "2. Heal" << endl << "3. Escape" << endl;
                 cin >> battle_command;
                 if (battle_command != 1 && battle_command != 2 && battle_command != 3 && battle_command != 9){
                     cout << "Wrong input, try again" << endl;
-                    battle_command = 0;
+                    battle_command = 9;
                 }
                 if (battle_command == 1){
                     cout << "You attack the enemy!" << endl;
                     //damage is + or - 10% of atk. therefore: battle_attack = rand()% (player_atk*0.10) + player_atk
-                    battle_attack = rand() % player_atk*0.1 + player_atk;
-                    cout << "You do " << battle_attack << " amount of damage!" << endl;
-                    monster_hp = monster_hp - battle_attack;
-                    cout << monster_name << " now has " << monster_hp << " HP!" << endl;
-                    PressEnter();
+                    //v3 = rand() % 30 + 1985;   // v3 in the range 1985-2014
+                    hit_chance = (player_spd/monster_spd);
+                    if (hit_chance >= 1.0){
+                        battle_attack = rand() % player_atk*0.1 + player_atk;
+                        cout << "You do " << battle_attack << " amount of damage!" << endl;
+                        monster_hp = monster_hp - battle_attack;
+                        cout << monster_name << " now has " << monster_hp << " HP!" << endl;
+                        PressEnter();
+                    }
+                    if (hit_chance <= 0.99){
+                        cout << "You swing at the enemy, but they dodge easily." << endl;
+                        PressEnter();
+                        }
                     if (monster_hp >= 1){
                         player_damage = (rand() % 1 + monster_atk) - player_def/2;
+                        if (player_damage << 0){
+                            player_damage = 0;
+                        }
                         cout << monster_name << " attacks you, and does " << player_damage << " damage!" << endl;
                         player_hp = player_hp - player_damage;
                         cout << "You now have " << player_hp << "/" << player_maxhp << "HP." << endl;
@@ -102,14 +118,18 @@ void battle(string monster_name, int monster_hp, int monster_atk, int xp_reward)
                     }
                 }
                 if (battle_command == 2){
+                    cout << "HP was at " << player_hp << "!" << endl;
                     player_hp = player_hp + (rand() % 1 + player_con*1.25);
                     if (player_hp > player_maxhp){
                         player_hp = player_maxhp;
                     }
-                    cout << "You heal and HP is now at: " << player_hp << "/" << player_maxhp << endl;
+                    cout << "HP is now at: " << player_hp << "/" << player_maxhp << endl;
                     PressEnter();
                     if (monster_hp >= 1){
                         player_damage = (rand() % 1 + monster_atk) - player_def/2;
+                        if (player_damage << 0){
+                            player_damage = 0;
+                        }
                         cout << monster_name << " attacks you, and does " << player_damage << " damage!" << endl;
                         player_hp = player_hp - player_damage;
                         cout << "You now have " << player_hp << "/" << player_maxhp << "HP." << endl;
@@ -118,11 +138,7 @@ void battle(string monster_name, int monster_hp, int monster_atk, int xp_reward)
                     if (player_hp <= 0){
                         gameover();
                     }
-                }
-                if (battle_command == 3){
-                    cout << "You ran away!" << endl;
-                    PressEnter();
-                    monster_hp = 0;
+                    }
                 }
                 if (monster_hp <= 0){
                     cout << "Victory!" << endl;
@@ -132,9 +148,16 @@ void battle(string monster_name, int monster_hp, int monster_atk, int xp_reward)
                     battle_initiator = 0;
                     enemy_picker = 0;
                 }
+                if (battle_command == 3){
+                    cout << "You ran away!" << endl;
+                    PressEnter();
+                    level_up();
+                    battle_initiator = 0;
+                    enemy_picker = 0;
+                    monster_hp = 0;s
+                }
         }
     }
-}
 
 int main(){
         while (player_setup == false){
@@ -243,24 +266,24 @@ int main(){
             PressEnter();
         }
         battle_initiator = rand() % 100; //Generates a number between 0 and 99
-            if (battle_initiator > 60){ //If above 60 then it initiates this code.
-                cout << "[[BATTLE INITIATING]]" << endl;
+            if (battle_initiator > 75){ //If above 60 then it initiates this code.
+                cout << "/nAn enemy appeared!" << endl;
                 enemy_picker = rand() % 5 + 1;
                 if (enemy_picker == 1){
-                    battle("Rat", 5, 10, 15);
+                    battle("Rat", 5, 10, 15, 10);
                 }
                 if (enemy_picker == 2){
-                    battle("Cat", 7, 12, 19);
+                    battle("Cat", 12, 7, 19, 8);
                 }
                 if (enemy_picker == 3){
-                    battle ("Bat", 9, 3, 12);
+                    battle ("Bat", 9, 6, 15, 22);
                 }
                 if (enemy_picker == 4){
-                    battle ("Panther", 15, 6, 27);
+                    battle ("Panther", 15, 9, 24, 33);
                 }
                 if (enemy_picker == 5){
-                    battle ("Tiger", 20, 7, 41);
-                    }
+                    battle ("Tiger", 20, 12, 15, 40);
                 }
-}
+            }
+    }
 }
